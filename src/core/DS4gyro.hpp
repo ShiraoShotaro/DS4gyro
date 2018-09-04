@@ -33,7 +33,7 @@ public:
 	const int kProductID;
 	const ConectionMode kConectionMode;
 
-	DS4gyro(const int vendor_id, const int product_id, const ConectionMode mode = kUsb) noexcept;
+	explicit DS4gyro(const int vendor_id, const int product_id, const ConectionMode mode = kUsb) noexcept;
 
 	~DS4gyro(void) noexcept;
 
@@ -43,9 +43,9 @@ public:
 
 	bool isOpening(void) const noexcept;
 
-	int getRawGryoX(void) const noexcept;
+	int getRawGyroX(void) const noexcept;
 
-	int getRawGryoY(void) const noexcept;
+	int getRawGyroY(void) const noexcept;
 
 	int getRawGyroZ(void) const noexcept;
 
@@ -55,9 +55,9 @@ public:
 
 	int getRawAccelZ(void) const noexcept;
 
-	virtual double getGryoX(const double & internal_bias = 1.0) const noexcept;
+	virtual double getGyroX(const double & internal_bias = 1.0) const noexcept;
 
-	virtual double getGryoY(const double & internal_bias = 1.0) const noexcept;
+	virtual double getGyroY(const double & internal_bias = 1.0) const noexcept;
 
 	virtual double getGyroZ(const double & internal_bias = 1.0) const noexcept;
 

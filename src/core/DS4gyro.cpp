@@ -14,7 +14,7 @@ wlib::DS4gyro::DS4gyro(const int vendor_id, const int product_id, const Conectio
 		if (ret < 0) std::cerr << "Error has occured." << std::endl;
 	}
 }
-wlib::DS4gyro::~DS4gyro(void) noexcept {}
+wlib::DS4gyro::~DS4gyro(void) noexcept { if (this->is_opening_) this->close(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // System Functions
@@ -34,14 +34,14 @@ bool wlib::DS4gyro::isOpening(void) const noexcept{ return this->is_opening_; }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessor
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int wlib::DS4gyro::getRawGryoX(void) const noexcept { return this->getRawGyro().x; }
-int wlib::DS4gyro::getRawGryoY(void) const noexcept { return this->getRawGyro().y; }
+int wlib::DS4gyro::getRawGyroX(void) const noexcept { return this->getRawGyro().x; }
+int wlib::DS4gyro::getRawGyroY(void) const noexcept { return this->getRawGyro().y; }
 int wlib::DS4gyro::getRawGyroZ(void) const noexcept { return this->getRawGyro().z; }
 int wlib::DS4gyro::getRawAccelX(void) const noexcept { return this->getRawAccel().x; }
 int wlib::DS4gyro::getRawAccelY(void) const noexcept { return this->getRawAccel().y; }
 int wlib::DS4gyro::getRawAccelZ(void) const noexcept { return this->getRawAccel().z; }
-double wlib::DS4gyro::getGryoX(const double & internal_bias) const noexcept { return this->getGyro().x * internal_bias; }
-double wlib::DS4gyro::getGryoY(const double & internal_bias) const noexcept { return this->getGyro().y * internal_bias; }
+double wlib::DS4gyro::getGyroX(const double & internal_bias) const noexcept { return this->getGyro().x * internal_bias; }
+double wlib::DS4gyro::getGyroY(const double & internal_bias) const noexcept { return this->getGyro().y * internal_bias; }
 double wlib::DS4gyro::getGyroZ(const double & internal_bias) const noexcept { return this->getGyro().z * internal_bias; }
 double wlib::DS4gyro::getAccelX(const double & internal_bias) const noexcept { return this->getAccel().x * internal_bias; }
 double wlib::DS4gyro::getAccelY(const double & internal_bias) const noexcept { return this->getAccel().y * internal_bias; }
