@@ -7,6 +7,19 @@ wlib::DS4gyro::DS4gyro(const int vendor_id, const int product_id, const Conectio
 	: kVendorID(vendor_id), kProductID(product_id), kConectionMode(mode) {}
 wlib::DS4gyro::~DS4gyro(void) noexcept {}
 
+void wlib::DS4gyro::update(void) noexcept
+{
+}
+
+void wlib::DS4gyro::close(void) noexcept
+{
+}
+
+bool wlib::DS4gyro::isDS4Found(void) const noexcept
+{
+	return false;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // System Functions
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
