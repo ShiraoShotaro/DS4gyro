@@ -80,7 +80,6 @@
 enum ConectionMode {USB, BLUETOOTH};
 
 class ofxDS4{
-
 	public:
 		void setup(ConectionMode mode = BLUETOOTH);
 		void update();
