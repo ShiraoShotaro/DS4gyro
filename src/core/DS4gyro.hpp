@@ -4,43 +4,6 @@
 
 #include "hidapi/hidapi.h"
 
-#include <windows.h>
-
-
-#include <stdio.h>
-#include <wchar.h>
-#include <string.h>
-#include <stdlib.h>
-
-#define VENDOR_ID 1356		// The vendor & product ID of HID device to be used:
-#define PRODUCT_ID 1476		//		(Currently setup for PS4 controller)
-
-#define ACC_FACTOR 9.8 / 8100.		// No' of m/s2 per arb unit of acceleration
-
-#define GYRO_FACTOR 1. / 1024.		// No of rad/s per arb unit of angular velocity
-#define GYRO_ERROR 0.001			// Estimated error on gyroscope measurement in rad/s
-
-#define TIME_FACTOR 0.00125 / 188.	// No' of secs per arb unit of time 
-
-
-// Indices for controller connected via USB
-#define GX_INDEX_USB 14		
-#define GY_INDEX_USB 16
-#define GZ_INDEX_USB 18
-#define DX_INDEX_USB 20
-#define DY_INDEX_USB 22
-#define DZ_INDEX_USB 24
-#define TIME_INDEX_USB 11 //Index of the timestamp byte
-
-// Indices for controller connected via Bluetooth
-#define GX_INDEX_BLUETOOTH 16
-#define GY_INDEX_BLUETOOTH 18
-#define GZ_INDEX_BLUETOOTH 20
-#define DX_INDEX_BLUETOOTH 22
-#define DY_INDEX_BLUETOOTH 24
-#define DZ_INDEX_BLUETOOTH 26
-#define TIME_INDEX_BLUETOOTH 13
-
 namespace wlib {
 
 class DS4gyro {
@@ -50,7 +13,8 @@ public:
 	};
 
 	enum {
-		kGyroRange = 1024
+		kGyroRange = 1024,
+		kAccelRange = 1024
 	};
 
 	template <typename T> struct Vector3 {
@@ -111,18 +75,16 @@ public:
 
 	virtual Vector3<double> getAccel(const Vector3<double> & internal_bias = Vector3<double>(1.0, 1.0, 1.0)) const noexcept;
 
-
-	//#####よくわからない者たち
-	void setBeta(const float beta);
-
-	int getRawTimestamp();
-	float getTimestamp();
-	float getTime();
-
-	int getArbPair(int index);
-	int getArbSingle(int index);
-
 private:
+
+	enum struct IndicesUSB : size_t{
+		kGyro_X = 14, kGyro_Y = 16, kGyro_Z = 18,
+		kAccel_X = 20, kAccel_Y = 22, kAccel_Z = 24
+	};
+	enum struct IndicesBT : size_t {
+		kGyro_X = 16, kGyro_Y = 18, kGyro_Z = 20,
+		kAccel_X = 22, kAccel_Y = 24, kAccel_Z = 26
+	};
 
 	Vector3<int> raw_gyro_;
 	Vector3<int> raw_accel_;
@@ -131,11 +93,6 @@ private:
 	unsigned char buffer[1024];
 
 	int readInt16LE(const int index);
-	
-	unsigned int readInt16LEUnsigned(const int index);
-	
-	int readInt8(const int index);
-
 	void calculate(void);
 
 };

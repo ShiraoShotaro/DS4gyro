@@ -1,3 +1,6 @@
+
+#ifdef TEMPORARY_FILE
+
 #include "ofxDS4.h"
 #include <iostream>
 
@@ -189,3 +192,4 @@ void ofxDS4::_updateAHRS(float dt, float gx, float gy, float gz, float ax, float
 	_quaternion[3] *= recipNorm;
 }
 
+#endif

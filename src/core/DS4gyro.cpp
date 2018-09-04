@@ -22,10 +22,8 @@ wlib::DS4gyro::~DS4gyro(void) noexcept {}
 void wlib::DS4gyro::update(void) noexcept{
 	if (this->is_opening_) {
 		int read_bytes = hid_read(this->hid_device_, this->buffer, sizeof(this->buffer));
-		if (read_bytes < 0) std::cerr << "HID receive error" << std::endl;
-		else this->calculate();
-	}
-	else std::cerr << "BAD Request update with hid closing." << std::endl;
+		if (read_bytes < 0) std::cerr << "HID receive error" << std::endl; else this->calculate();
+	} else std::cerr << "BAD Request update with hid closing." << std::endl;
 }
 void wlib::DS4gyro::close(void) noexcept{
 	if (this->is_opening_) { hid_close(this->hid_device_); hid_exit(); }
@@ -56,19 +54,22 @@ wlib::DS4gyro::Vector3<double> wlib::DS4gyro::getGyro(const Vector3<double> & in
 }
 wlib::DS4gyro::Vector3<double> wlib::DS4gyro::getAccel(const Vector3<double> & internal_bias) const noexcept {
 	const auto raw = this->getRawAccel();
-	return Vector3<double>(static_cast<double>(raw.x) / kGyroRange * internal_bias.x, static_cast<double>(raw.y) / kGyroRange * internal_bias.y, static_cast<double>(raw.z) / kGyroRange * internal_bias.z);
+	return Vector3<double>(static_cast<double>(raw.x) / kAccelRange * internal_bias.x, static_cast<double>(raw.y) / kAccelRange * internal_bias.y, static_cast<double>(raw.z) / kAccelRange * internal_bias.z);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Utility
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int wlib::DS4gyro::readInt16LE(const int index){ return static_cast<int>(static_cast<short>(this->buffer[index + 1] << 8 | this->buffer[index])); }
-unsigned int wlib::DS4gyro::readInt16LEUnsigned(const int index) { return static_cast<unsigned int>(static_cast<unsigned short>(this->buffer[index + 1] << 8 | this->buffer[index])); }
-int wlib::DS4gyro::readInt8(const int index) { return static_cast<int>(buffer[index]); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Calculate
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void wlib::DS4gyro::calculate(void){
-
+	this->raw_gyro_.x = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kGyro_X) : static_cast<size_t>(IndicesBT::kGyro_X));
+	this->raw_gyro_.y = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kGyro_Y) : static_cast<size_t>(IndicesBT::kGyro_Y));
+	this->raw_gyro_.z = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kGyro_Z) : static_cast<size_t>(IndicesBT::kGyro_Z));
+	this->raw_accel_.x = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kAccel_X) : static_cast<size_t>(IndicesBT::kAccel_X));
+	this->raw_accel_.y = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kAccel_Y) : static_cast<size_t>(IndicesBT::kAccel_Y));
+	this->raw_accel_.z = this->readInt16LE(kConectionMode == kUsb ? static_cast<size_t>(IndicesUSB::kAccel_Z) : static_cast<size_t>(IndicesBT::kAccel_Z));
 }
