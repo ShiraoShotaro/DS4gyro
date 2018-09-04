@@ -77,7 +77,7 @@ public:
 
 	void close(void) noexcept;
 
-	bool isDS4Found(void) const noexcept;
+	bool isOpening(void) const noexcept;
 
 	int getRawGryoX(void) const noexcept;
 
@@ -126,35 +126,17 @@ private:
 
 	Vector3<int> raw_gyro_;
 	Vector3<int> raw_accel_;
+	hid_device * hid_device_;
+	bool is_opening_;
+	unsigned char buffer[1024];
 
 	int readInt16LE(const int index);
-	int readInt16LEUnsigned(const int index);
+	
+	unsigned int readInt16LEUnsigned(const int index);
+	
 	int readInt8(const int index);
 
-	void updateHID();
-	void updateTimeStep();
-	void updateAHRS(float dt, float gx, float gy, float gz, float ax, float ay, float az);
-
-
-
-	hid_device* _hidDevice;
-	unsigned char _buffer[256];
-	int _resultFlag;
-
-	float _previousTimestamp;
-	float _timeStep;
-	float _time;
-
-	float _quaternion[4];
-	float _beta;
-
-	int GX_Index;
-	int GY_Index;
-	int GZ_Index;
-	int DX_Index;
-	int DY_Index;
-	int DZ_Index;
-	int TIME_Index;
+	void calculate(void);
 
 };
 

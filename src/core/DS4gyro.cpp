@@ -1,29 +1,37 @@
 ﻿#include "DS4gyro.hpp"
+#include <iostream>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Constructor & Destructor
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 wlib::DS4gyro::DS4gyro(const int vendor_id, const int product_id, const ConectionMode mode) noexcept
-	: kVendorID(vendor_id), kProductID(product_id), kConectionMode(mode) {}
+	: kVendorID(vendor_id), kProductID(product_id), kConectionMode(mode), hid_device_(nullptr), is_opening_(false){
+	if ((this->hid_device_ = hid_open(this->kVendorID, this->kProductID, nullptr)) != nullptr){
+		this->is_opening_ = true;
+		this->update();
+		this->buffer[0] = 0x02;
+		int ret = hid_get_feature_report(this->hid_device_, this->buffer, sizeof(this->buffer));
+		if (ret < 0) std::cerr << "Error has occured." << std::endl;
+	}
+}
 wlib::DS4gyro::~DS4gyro(void) noexcept {}
-
-void wlib::DS4gyro::update(void) noexcept
-{
-}
-
-void wlib::DS4gyro::close(void) noexcept
-{
-}
-
-bool wlib::DS4gyro::isDS4Found(void) const noexcept
-{
-	return false;
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // System Functions
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+void wlib::DS4gyro::update(void) noexcept{
+	if (this->is_opening_) {
+		int read_bytes = hid_read(this->hid_device_, this->buffer, sizeof(this->buffer));
+		if (read_bytes < 0) std::cerr << "HID receive error" << std::endl;
+		else this->calculate();
+	}
+	else std::cerr << "BAD Request update with hid closing." << std::endl;
+}
+void wlib::DS4gyro::close(void) noexcept{
+	if (this->is_opening_) { hid_close(this->hid_device_); hid_exit(); }
+	this->is_opening_ = false;
+}
+bool wlib::DS4gyro::isOpening(void) const noexcept{ return this->is_opening_; }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Accessor
@@ -49,4 +57,18 @@ wlib::DS4gyro::Vector3<double> wlib::DS4gyro::getGyro(const Vector3<double> & in
 wlib::DS4gyro::Vector3<double> wlib::DS4gyro::getAccel(const Vector3<double> & internal_bias) const noexcept {
 	const auto raw = this->getRawAccel();
 	return Vector3<double>(static_cast<double>(raw.x) / kGyroRange * internal_bias.x, static_cast<double>(raw.y) / kGyroRange * internal_bias.y, static_cast<double>(raw.z) / kGyroRange * internal_bias.z);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Utility
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+int wlib::DS4gyro::readInt16LE(const int index){ return static_cast<int>(static_cast<short>(this->buffer[index + 1] << 8 | this->buffer[index])); }
+unsigned int wlib::DS4gyro::readInt16LEUnsigned(const int index) { return static_cast<unsigned int>(static_cast<unsigned short>(this->buffer[index + 1] << 8 | this->buffer[index])); }
+int wlib::DS4gyro::readInt8(const int index) { return static_cast<int>(buffer[index]); }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calculate
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void wlib::DS4gyro::calculate(void){
+
 }
